@@ -1,0 +1,14 @@
+# compress_array { #spikepack.compress_array }
+
+```python
+compress_array(arr)
+```
+
+Compress a numpy array with Blosc(zstd, shuffle).
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name    | Type   | Description                                                           |
+|---------|--------|-----------------------------------------------------------------------|
+| payload | bytes  | Compressed byte payload.                                              |
+| spec    | dict   | `dtype`, `shape`, `nbytes`, `compressed_nbytes` needed to decompress. |

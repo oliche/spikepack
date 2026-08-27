@@ -1,0 +1,13 @@
+# read_zarr { #spikepack.read_zarr }
+
+```python
+read_zarr(path, *, group=None)
+```
+
+Read a spike train written by `write_zarr`.
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                |
+|--------|--------|------------------------------------------------------------|
+|        | dict   | `times` (seconds, float64), `labels` (if present), `meta`. |

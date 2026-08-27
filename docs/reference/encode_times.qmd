@@ -1,0 +1,27 @@
+# encode_times { #spikepack.encode_times }
+
+```python
+encode_times(times_seconds, *, quantization_us=DEFAULT_QUANTIZATION_US)
+```
+
+Quantize and delta-encode a sorted array of event times.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type       | Description                                               | Default                   |
+|-----------------|------------|-----------------------------------------------------------|---------------------------|
+| times_seconds   | np.ndarray | Sorted (ascending), 1-D array of event times in seconds.  | _required_                |
+| quantization_us | int        | Tick size in microseconds. `100` means one tick = 0.1 ms. | `DEFAULT_QUANTIZATION_US` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type       | Description                                                              |
+|--------|------------|--------------------------------------------------------------------------|
+| deltas | np.ndarray | Delta-encoded integer ticks, dtype chosen to be as narrow as possible.   |
+| meta   | dict       | Fields required to decode: `quantization_us`, `origin_seconds`, `dtype`. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type           | Description                                                                                                                       |
+|--------|----------------|-----------------------------------------------------------------------------------------------------------------------------------|
+|        | SpikepackError | If `quantization_us` is not positive, times are not sorted, or the largest delta overflows the widest candidate dtype (`uint64`). |

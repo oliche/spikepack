@@ -1,0 +1,28 @@
+# write_zarr { #spikepack.write_zarr }
+
+```python
+write_zarr(
+    path,
+    *,
+    times_seconds,
+    labels=None,
+    quantization_us=DEFAULT_QUANTIZATION_US,
+    group=None,
+    chunk_size=None,
+    extra_meta=None,
+)
+```
+
+Write a spike train to a Zarr group.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type       | Description                                                                     | Default                   |
+|-----------------|------------|---------------------------------------------------------------------------------|---------------------------|
+| path            | Path       | Zarr store path (a single store may hold multiple trains as sibling groups).    | _required_                |
+| times_seconds   | np.ndarray | Sorted event times in seconds.                                                  | _required_                |
+| labels          | np.ndarray | Per-event integer label (e.g. unit/cluster id), same length as `times_seconds`. | `None`                    |
+| quantization_us | int        | Tick size in microseconds.                                                      | `DEFAULT_QUANTIZATION_US` |
+| group           | str        | Subgroup name within the store (default: store root).                           | `None`                    |
+| chunk_size      | int        | Chunk length in events (default: whole array in one chunk).                     | `None`                    |
+| extra_meta      | dict       | Extra fields merged into the group's Zarr attributes.                           | `None`                    |

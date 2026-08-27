@@ -1,0 +1,7 @@
+# decompress_array { #spikepack.decompress_array }
+
+```python
+decompress_array(payload, spec)
+```
+
+Invert `compress_array`.

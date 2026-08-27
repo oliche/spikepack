@@ -1,0 +1,13 @@
+# read_blosc { #spikepack.read_blosc }
+
+```python
+read_blosc(path)
+```
+
+Read a spike train written by `write_blosc`.
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                |
+|--------|--------|------------------------------------------------------------|
+|        | dict   | `times` (seconds, float64), `labels` (if present), `meta`. |

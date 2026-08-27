@@ -3,7 +3,7 @@
 ## Development setup
 
 ```bash
-git clone https://github.com/int-brain-lab/spikepack
+git clone https://github.com/oliche/spikepack
 cd spikepack
 uv sync --group dev
 git config core.hooksPath .githooks

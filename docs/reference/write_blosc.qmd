@@ -1,0 +1,30 @@
+# write_blosc { #spikepack.write_blosc }
+
+```python
+write_blosc(
+    path,
+    *,
+    times_seconds,
+    labels=None,
+    quantization_us=DEFAULT_QUANTIZATION_US,
+    extra_meta=None,
+)
+```
+
+Write a spike train to a Blosc directory shard.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name            | Type       | Description                                                                     | Default                   |
+|-----------------|------------|---------------------------------------------------------------------------------|---------------------------|
+| path            | Path       | Output directory (created if missing).                                          | _required_                |
+| times_seconds   | np.ndarray | Sorted event times in seconds.                                                  | _required_                |
+| labels          | np.ndarray | Per-event integer label (e.g. unit/cluster id), same length as `times_seconds`. | `None`                    |
+| quantization_us | int        | Tick size in microseconds.                                                      | `DEFAULT_QUANTIZATION_US` |
+| extra_meta      | dict       | Extra fields merged into `meta.json` (e.g. `source`, `recording_id`).           | `None`                    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                  |
+|--------|--------|------------------------------|
+|        | int    | Total bytes written to disk. |

@@ -4,7 +4,7 @@ project:
 
 website:
   title: "spikepack"
-  repo-url: https://github.com/int-brain-lab/spikepack
+  repo-url: https://github.com/oliche/spikepack
   navbar:
     left:
       - text: "Tutorial"
@@ -30,9 +30,9 @@ website:
     right:
       - text: "Help"
         icon: question-circle
-        href: https://github.com/int-brain-lab/spikepack/issues
+        href: https://github.com/oliche/spikepack/issues
       - icon: github
-        href: https://github.com/int-brain-lab/spikepack
+        href: https://github.com/oliche/spikepack
 
 format:
   html:

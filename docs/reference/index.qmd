@@ -1,25 +1,23 @@
----
-title: "API reference"
----
-
-::: {.callout-note}
-This page is a manual summary. Run `uv run quartodoc build --config docs/_quarto.yml`
-to regenerate full docstring-based reference pages under `docs/reference/`.
-:::
+# Function reference {.doc .doc-index}
 
 ## Codec
 
-- `encode_times(times_seconds, *, quantization_us=100) -> (deltas, meta)` — quantize + delta-encode a sorted event-time array.
-- `decode_times(deltas, meta) -> times_seconds` — invert `encode_times`.
-- `compress_array(arr) -> (payload, spec)` — Blosc(zstd, shuffle)-compress a numpy array.
-- `decompress_array(payload, spec) -> arr` — invert `compress_array`.
+Encode/decode sorted event-time arrays and compress/decompress numpy arrays.
+
+| | |
+| --- | --- |
+| [encode_times](encode_times.qmd#spikepack.encode_times) | Quantize and delta-encode a sorted array of event times. |
+| [decode_times](decode_times.qmd#spikepack.decode_times) | Invert `encode_times`. |
+| [compress_array](compress_array.qmd#spikepack.compress_array) | Compress a numpy array with Blosc(zstd, shuffle). |
+| [decompress_array](decompress_array.qmd#spikepack.decompress_array) | Invert `compress_array`. |
 
 ## Containers
 
-- `write_blosc(path, *, times_seconds, labels=None, quantization_us=100, extra_meta=None) -> int` — write a Blosc directory shard; returns bytes written.
-- `read_blosc(path) -> dict` — read one, returns `{times, labels?, meta}`.
-- `write_zarr(path, *, times_seconds, labels=None, quantization_us=100, group=None, chunk_size=None, extra_meta=None) -> None` — write a Zarr group.
-- `read_zarr(path, *, group=None) -> dict` — read one, returns `{times, labels?, meta}`.
+Read/write encoded spike trains to disk.
 
-See [On-disk format](format.qmd) for the exact layout, and the
-[tutorial](../tutorials/first-compression.qmd) for a worked example.
+| | |
+| --- | --- |
+| [write_blosc](write_blosc.qmd#spikepack.write_blosc) | Write a spike train to a Blosc directory shard. |
+| [read_blosc](read_blosc.qmd#spikepack.read_blosc) | Read a spike train written by `write_blosc`. |
+| [write_zarr](write_zarr.qmd#spikepack.write_zarr) | Write a spike train to a Zarr group. |
+| [read_zarr](read_zarr.qmd#spikepack.read_zarr) | Read a spike train written by `write_zarr`. |

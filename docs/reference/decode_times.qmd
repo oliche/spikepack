@@ -1,0 +1,20 @@
+# decode_times { #spikepack.decode_times }
+
+```python
+decode_times(deltas, meta)
+```
+
+Invert `encode_times`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type       | Description                                                                     | Default    |
+|--------|------------|---------------------------------------------------------------------------------|------------|
+| deltas | np.ndarray | Delta-encoded integer ticks, as returned by `encode_times`.                     | _required_ |
+| meta   | dict       | Metadata dict returned by `encode_times` (`quantization_us`, `origin_seconds`). | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type       | Description                                                                                                    |
+|--------|------------|----------------------------------------------------------------------------------------------------------------|
+|        | np.ndarray | Reconstructed event times in seconds (`float64`), equal to the input times to within half a quantization step. |

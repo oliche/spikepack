@@ -1,0 +1,45 @@
+---
+title: "spikepack"
+subtitle: "Delta-quantization codec for sorted spike-time arrays"
+---
+
+**spikepack** compresses sorted spike (or any sorted event-time) arrays by quantizing
+to integer ticks, delta-encoding, and compressing with Blosc(zstd, shuffle). It
+routinely reaches **>10× compression** over raw `float64` seconds at a `100 µs`
+quantization (≤ 50 µs worst-case timing error), because sorted timestamps have
+much lower entropy as small deltas than as absolute values.
+
+Extracted and generalized from the `bwm_ephys` spike-store builder in
+[`int-brain-lab/ibl-ai-agent`](https://github.com/int-brain-lab/ibl-ai-agent),
+where this exact recipe (`delta_int_ticks + 100us + shuffle_zstd`) is the frozen
+default for the IBL Brain-Wide Map ephys release.
+
+## Documentation
+
+| Section | Content |
+|---|---|
+| [Tutorial](tutorials/first-compression.qmd) | Encode, write, and read your first spike train |
+| [How-To: Choose a quantization](how-to/choose-quantization.qmd) | Trading fidelity for size |
+| [How-To: Blosc vs Zarr](how-to/blosc-vs-zarr.qmd) | Picking a container format |
+| [Reference: API](reference/index.qmd) | Full API reference |
+| [Reference: On-disk format](reference/format.qmd) | Blosc-shard and Zarr layout specs |
+| [Explanation: Codec design](explanation/encoding.qmd) | Why quantize + delta-encode + shuffle |
+| [Explanation: Benchmark](explanation/benchmark.qmd) | Blosc vs Zarr across 11 real IBL insertions |
+
+## Quick start
+
+```bash
+pip install spikepack        # add the `zarr` extra for Zarr container support
+```
+
+```python
+import numpy as np
+from spikepack import write_blosc, read_blosc
+
+times = np.sort(np.random.default_rng(0).exponential(0.02, 1_000_000).cumsum())
+labels = np.random.default_rng(0).integers(0, 200, times.size)  # e.g. unit/cluster id
+
+write_blosc("spikes", times_seconds=times, labels=labels, quantization_us=100)
+out = read_blosc("spikes")
+# out["times"], out["labels"], out["meta"]
+```

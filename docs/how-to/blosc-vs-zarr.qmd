@@ -1,0 +1,27 @@
+---
+title: "Blosc vs Zarr"
+subtitle: "Picking a container format"
+---
+
+Both `write_blosc`/`read_blosc` and `write_zarr`/`read_zarr` encode with the exact
+same codec (`encode_times` + Blosc(zstd, shuffle)) — compression ratio and fidelity
+are the same either way. The choice is about the container, not the compression.
+
+| | Blosc directory shard | Zarr |
+|---|---|---|
+| Dependency | `numcodecs` only | `numcodecs` + `zarr` |
+| Metadata | hand-rolled `meta.json` | standard Zarr group attrs (`zarr.json`) |
+| Interop | only readable via `spikepack.read_blosc` | any Zarr client (Python, JS, Julia, R) |
+| Chunking | whole array in one block | can be chunked (`chunk_size=`) for partial/streaming reads |
+| Multiple trains | one directory per train | can share one store as sibling groups (`group=`) |
+
+**Use Blosc** for a minimal-dependency, self-contained archive of one train per
+directory — e.g. shipping a single dataset release where every consumer already
+uses this library.
+
+**Use Zarr** when other tools need to read the data without this library, when you
+want multiple recordings addressable in one store (`group="rec_a"`, `group="rec_b"`,
+...), or when a single train is large enough that chunked/partial reads matter.
+
+See the [benchmark](../explanation/benchmark.qmd) page for measured size and speed
+differences across real recordings.

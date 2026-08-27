@@ -1,0 +1,52 @@
+---
+title: "Your first compression"
+subtitle: "Encode, write, and read a spike train"
+---
+
+## Install
+
+```bash
+pip install spikepack[zarr]   # drop [zarr] if you only need the Blosc container
+```
+
+## Encode a spike train
+
+`encode_times` takes a sorted array of event times in seconds and returns
+delta-encoded integer ticks plus the metadata needed to invert the transform:
+
+```python
+import numpy as np
+from spikepack import encode_times, decode_times
+
+rng = np.random.default_rng(0)
+times = np.cumsum(rng.exponential(scale=1 / 50, size=100_000))  # ~50 Hz Poisson train
+
+deltas, meta = encode_times(times, quantization_us=100)
+print(deltas.dtype, meta)
+
+recovered = decode_times(deltas, meta)
+print(np.max(np.abs(recovered - times)))  # <= 50e-6 (half a tick)
+```
+
+## Write and read a container
+
+`write_blosc`/`read_blosc` wrap `encode_times` with array compression and an
+on-disk layout, and optionally carry a per-event integer label (e.g. a unit or
+cluster id):
+
+```python
+from spikepack import write_blosc, read_blosc
+
+labels = rng.integers(0, 50, size=times.size)  # e.g. cluster id per spike
+
+write_blosc("my_recording", times_seconds=times, labels=labels, quantization_us=100)
+out = read_blosc("my_recording")
+
+out["times"]   # float64 seconds, reconstructed
+out["labels"]  # original labels, exact
+out["meta"]    # quantization_us, dtype, n_events, ...
+```
+
+`write_zarr`/`read_zarr` have the same signature and store the same information
+in a standard Zarr group instead — see the [Blosc vs Zarr how-to](../how-to/blosc-vs-zarr.qmd)
+for when to prefer one over the other.

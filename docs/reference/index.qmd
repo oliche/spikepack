@@ -1,0 +1,25 @@
+---
+title: "API reference"
+---
+
+::: {.callout-note}
+This page is a manual summary. Run `uv run quartodoc build --config docs/_quarto.yml`
+to regenerate full docstring-based reference pages under `docs/reference/`.
+:::
+
+## Codec
+
+- `encode_times(times_seconds, *, quantization_us=100) -> (deltas, meta)` — quantize + delta-encode a sorted event-time array.
+- `decode_times(deltas, meta) -> times_seconds` — invert `encode_times`.
+- `compress_array(arr) -> (payload, spec)` — Blosc(zstd, shuffle)-compress a numpy array.
+- `decompress_array(payload, spec) -> arr` — invert `compress_array`.
+
+## Containers
+
+- `write_blosc(path, *, times_seconds, labels=None, quantization_us=100, extra_meta=None) -> int` — write a Blosc directory shard; returns bytes written.
+- `read_blosc(path) -> dict` — read one, returns `{times, labels?, meta}`.
+- `write_zarr(path, *, times_seconds, labels=None, quantization_us=100, group=None, chunk_size=None, extra_meta=None) -> None` — write a Zarr group.
+- `read_zarr(path, *, group=None) -> dict` — read one, returns `{times, labels?, meta}`.
+
+See [On-disk format](format.qmd) for the exact layout, and the
+[tutorial](../tutorials/first-compression.qmd) for a worked example.

@@ -1,0 +1,46 @@
+---
+title: "On-disk format"
+---
+
+## Common metadata fields
+
+Both containers store the same fields, produced by `encode_times`:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `quantization_us` | int | Tick size in microseconds |
+| `origin_seconds` | float | First event's absolute time, subtracted before quantization |
+| `dtype` | str | Delta array dtype: `uint16`, `uint32`, or `uint64` |
+| `n_events` | int | Number of events |
+| `max_delta_ticks` | int | Largest single delta, in ticks (omitted for empty trains) |
+| `has_labels` | bool | Whether an `event_labels` array is present |
+
+Plus any `extra_meta` passed by the caller (e.g. `pid`, `source`, `recording_id`).
+
+## Blosc directory shard
+
+```text
+<path>/
+  meta.json                       # metadata + per-array {entry, dtype, shape, nbytes, compressed_nbytes, codec}
+  event_times_delta_ticks.blosc   # Blosc(zstd, shuffle)-compressed delta ticks
+  event_labels.blosc              # present only if labels were provided
+```
+
+Each `.blosc` file is a single opaque Blosc-encoded blob (whole array, no internal
+chunking) — decodable only by reading `meta.json` for `dtype`/`shape` first.
+
+## Zarr
+
+```text
+<path>.zarr/
+  zarr.json                       # group metadata; custom fields (quantization_us, ...) in attributes
+  event_times_delta_ticks/
+    zarr.json                     # dtype, shape, chunks, codecs=[blosc(zstd, shuffle)]
+    c/0                           # chunk data
+  event_labels/                   # present only if labels were provided
+    zarr.json
+    c/0
+```
+
+`write_zarr(..., group="rec_a")` nests a train under a named subgroup instead of
+the store root, so one store can hold multiple trains as sibling groups.

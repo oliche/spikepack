@@ -1,0 +1,61 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "spikepack"
+  repo-url: https://github.com/int-brain-lab/spikepack
+  navbar:
+    left:
+      - text: "Tutorial"
+        file: tutorials/first-compression.qmd
+      - text: "How-To"
+        menu:
+          - text: "Choose a quantization"
+            file: how-to/choose-quantization.qmd
+          - text: "Blosc vs Zarr"
+            file: how-to/blosc-vs-zarr.qmd
+      - text: "Reference"
+        menu:
+          - text: "API"
+            file: reference/index.qmd
+          - text: "On-disk format"
+            file: reference/format.qmd
+      - text: "Explanation"
+        menu:
+          - text: "Codec design"
+            file: explanation/encoding.qmd
+          - text: "Benchmark: 11 IBL insertions"
+            file: explanation/benchmark.qmd
+    right:
+      - text: "Help"
+        icon: question-circle
+        href: https://github.com/int-brain-lab/spikepack/issues
+      - icon: github
+        href: https://github.com/int-brain-lab/spikepack
+
+format:
+  html:
+    theme: minty
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+
+quartodoc:
+  package: spikepack
+  dir: reference
+  sections:
+    - title: "Codec"
+      desc: "Encode/decode sorted event-time arrays and compress/decompress numpy arrays."
+      contents:
+        - encode_times
+        - decode_times
+        - compress_array
+        - decompress_array
+    - title: "Containers"
+      desc: "Read/write encoded spike trains to disk."
+      contents:
+        - write_blosc
+        - read_blosc
+        - write_zarr
+        - read_zarr

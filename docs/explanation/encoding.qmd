@@ -1,0 +1,47 @@
+---
+title: "Codec design"
+subtitle: "Why quantize, delta-encode, and shuffle"
+---
+
+## The pipeline
+
+1. **Origin-normalize** — subtract the first timestamp so tick values start near zero.
+2. **Quantize** — round to integer ticks at a configurable resolution (default `100 µs`).
+3. **Delta-encode** — store `d0 = 0, d_i = tick_i - tick_{i-1}` instead of absolute ticks.
+4. **Narrow the dtype** — pick the smallest of `uint16 -> uint32 -> uint64` that holds the largest delta.
+5. **Compress with Blosc(zstd, shuffle)** — the byte-shuffle filter regroups bytes by
+   significance before Zstandard compression, which helps narrow integer/delta arrays
+   compress far better than compressing the raw bytes directly.
+
+## Why delta-encoding helps
+
+Spike times are sorted. Absolute timestamps span the whole recording (high entropy,
+wide dtype required), but successive differences between spikes are almost always
+small — bounded by typical inter-spike intervals rather than recording duration. Small,
+low-entropy integers compress dramatically better under Zstandard than wide,
+high-entropy ones.
+
+## Why quantize at all
+
+Spike sorters resolve times to sample-rate precision (tens of microseconds), but most
+downstream analyses (PSTHs, event alignment, correlation) don't need finer than
+`~100 µs`. Quantizing before delta-encoding shrinks the deltas further and caps the
+maximum error introduced to half a tick. This is the only lossy step in the pipeline —
+everything else (delta-encoding, dtype narrowing, Blosc) is exactly invertible.
+
+## Why the dtype fallback chain
+
+A single insertion-wide delta encoding is only as good as its widest gap. A
+recording with a long silent gap (a pause between sessions, a probe repositioning
+break) could overflow `uint16` even though 99.9% of deltas are tiny. Rather than
+force every recording onto a wide dtype "just in case", `encode_times` starts narrow
+and only widens when a specific train actually needs it — recorded in `meta["dtype"]`,
+so the choice is self-describing per train rather than a hardcoded assumption.
+
+## Picking a quantization
+
+This recipe was profiled and frozen for the IBL Brain-Wide Map `bwm_ephys` release at
+`100 µs` as the preferred tradeoff between compact storage, decode speed, and fidelity
+for reviewed BWM analyses — see the [benchmark](benchmark.qmd) page and the
+[quantization how-to](../how-to/choose-quantization.qmd) for how to pick a value for
+your own data instead of assuming `100 µs` is universally correct.

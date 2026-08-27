@@ -1,0 +1,37 @@
+---
+title: "Choose a quantization"
+---
+
+`quantization_us` is the only lossy knob in spikepack — it trades maximum timing
+error against size. The error introduced is bounded and predictable: at most half
+a tick.
+
+| `quantization_us` | Worst-case error | Notes |
+|---|---|---|
+| `25` | ≤ 12.5 µs | close to raw sorter precision; larger deltas, less compressible |
+| `50` | ≤ 25 µs | conservative default if you're unsure |
+| `100` | ≤ 50 µs | frozen default for IBL `bwm_ephys`; good fidelity/size tradeoff for PSTH/event-alignment analyses |
+| `250` | ≤ 125 µs | smallest files; only if downstream analysis truly doesn't need sub-ms precision |
+
+## Profile it on your own data
+
+Compression ratio depends on firing rate (denser trains → smaller deltas → better
+ratios) and on how much of the signal is genuinely random vs. bursty/rhythmic, so
+the right value can differ from IBL's. Profile a few settings on a representative
+sample before committing to one:
+
+```python
+import numpy as np
+from spikepack import encode_times, compress_array
+
+for q in (25, 50, 100, 250):
+    deltas, meta = encode_times(times, quantization_us=q)
+    payload, spec = compress_array(deltas)
+    print(f"{q:>4} us  ->  dtype={meta['dtype']:<6}  "
+          f"compressed={len(payload):,} B  "
+          f"CR={times.nbytes / len(payload):.1f}x")
+```
+
+Keep the chosen value consistent within one dataset release, and always record it
+in the container's metadata (`write_blosc`/`write_zarr` do this automatically via
+`meta["quantization_us"]`) — a reader has no way to recover it otherwise.

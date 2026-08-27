@@ -3,7 +3,7 @@ name = "spikepack"
 version = "0.1.0"
 description = "Spike-train codec — lossless-order delta-quantization compression for sorted spike/event times"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "The International Brain Laboratory" }]
 dependencies = [

@@ -136,13 +136,13 @@ def write_zarr(
         Extra fields merged into the group's Zarr attributes.
     """
     import zarr
-    from zarr.codecs import BloscCodec, BloscShuffle
+    from zarr.codecs import BloscCodec
 
     arrays, meta = _build_arrays(times_seconds, labels, quantization_us)
     meta = {**meta, **(extra_meta or {})}
     root = zarr.open_group(str(path), mode="a")
     target = root.require_group(group) if group else root
-    codec = BloscCodec(cname="zstd", clevel=7, shuffle=BloscShuffle.shuffle)
+    codec = BloscCodec(cname="zstd", clevel=7, shuffle="shuffle")
     for name, arr in arrays.items():
         if name in target:
             del target[name]
